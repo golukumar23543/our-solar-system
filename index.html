@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solar System | Mr. Golu</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: black;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      color: white;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      opacity: 0.7;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<div class="footer">Created by Mr. Golu</div>
+
+<script>
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  resizeCanvas();
+  window.addEventListener("resize", resizeCanvas);
+
+  let angle = 0;
+  let moonAngle = 0;
+
+  const earthTrail = [];
+  const moonTrail = [];
+
+  function draw() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const sunX = canvas.width / 2;
+    const sunY = canvas.height / 2;
+
+    // Sun
+    ctx.beginPath();
+    ctx.arc(sunX, sunY, 30, 0, Math.PI * 2);
+    ctx.fillStyle = "yellow";
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = "yellow";
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Earth
+    const earthOrbit = canvas.width < canvas.height ? canvas.width * 0.25 : canvas.height * 0.25;
+    const earthX = sunX + Math.cos(angle) * earthOrbit;
+    const earthY = sunY + Math.sin(angle) * earthOrbit;
+
+    earthTrail.push({ x: earthX, y: earthY });
+    if (earthTrail.length > 100) earthTrail.shift();
+
+    for (let i = 0; i < earthTrail.length; i++) {
+      const t = earthTrail[i];
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, 2, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(0, 255, 255, ${i / earthTrail.length})`;
+      ctx.fill();
+    }
+
+    ctx.beginPath();
+    ctx.arc(earthX, earthY, 10, 0, Math.PI * 2);
+    ctx.fillStyle = "cyan";
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = "cyan";
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Moon
+    const moonOrbit = 25;
+    const moonX = earthX + Math.cos(moonAngle) * moonOrbit;
+    const moonY = earthY + Math.sin(moonAngle) * moonOrbit;
+
+    moonTrail.push({ x: moonX, y: moonY });
+    if (moonTrail.length > 60) moonTrail.shift();
+
+    for (let i = 0; i < moonTrail.length; i++) {
+      const t = moonTrail[i];
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255, 255, 255, ${i / moonTrail.length})`;
+      ctx.fill();
+    }
+
+    ctx.beginPath();
+    ctx.arc(moonX, moonY, 4, 0, Math.PI * 2);
+    ctx.fillStyle = "white";
+    ctx.shadowBlur = 5;
+    ctx.shadowColor = "white";
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    angle += 0.01;
+    moonAngle += 0.05;
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+</script>
+</body>
+</html>
